@@ -6,6 +6,12 @@
 int main(int argc, char* argv[])
 {
     CommandLineArguments arguments = ParseCommandLineArguments(argc, argv);
+
+    if (arguments.montage.empty())
+    {
+        PRINT("Montage not specified, stream will be missing channel label metadata.")
+    }
+
     std::string serial_port = arguments.serial_port;
 
     while (serial_port.empty())
@@ -13,11 +19,8 @@ int main(int argc, char* argv[])
         PRINT("Serial Port not specified.");
         PRINT("\t0) rescan");
 
-        
-
-        std::vector<serial::SerialPortInfo> devices_found
-            = serial::CSerialPortInfo::availablePortInfos();
-        size_t device_count = devices_found.size();
+        auto devices_found = serial::CSerialPortInfo::availablePortInfos();
+        int device_count = (int)devices_found.size();
 
         int device_index = 1;
         for (const serial::SerialPortInfo& device : devices_found)
@@ -34,9 +37,9 @@ int main(int argc, char* argv[])
         {
             std::string input;
             std::cin >> input;
-            unsigned int selection = std::stoi(input);
+            int selection = std::stoi(input);
 
-            if ((int)selection >= device_count) exit(0);
+            if (selection > 0 && selection >= device_count) exit(0);
             else if (selection > 1)
             {
                 serial_port = devices_found[selection - 1].portName;
@@ -47,6 +50,8 @@ int main(int argc, char* argv[])
             PRINT("Invalid selection, exiting...")
             (void)err; exit(0);
         }
+
+        if (serial_port.empty()) clear_lines(device_count + 5);
     }
     
 }
