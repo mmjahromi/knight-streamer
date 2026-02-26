@@ -7,3 +7,6 @@
 [submodule "thirdparty/argparse"]
 	path = thirdparty/argparse
 	url = https://github.com/p-ranav/argparse
+[submodule "thirdparty/CSerialPort"]
+	path = thirdparty/CSerialPort
+	url = https://github.com/itas109/CSerialPort

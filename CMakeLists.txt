@@ -10,6 +10,8 @@ set(SUBMODULE_PATH ${CMAKE_SOURCE_DIR}/thirdparty)
 
 add_executable(knight_pipe
     src/main.cpp
+    src/arguments.cpp
+    src/utils/print_helpers.cpp
     src/neuropawn/knight_base.cpp
     src/neuropawn/knight.cpp
     src/neuropawn/knight_imu.cpp
@@ -22,6 +24,10 @@ target_include_directories(knight_pipe PRIVATE include)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/liblsl)
 target_link_libraries(knight_pipe LINK_PUBLIC lsl)
 
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/CSerialPort)
+target_link_libraries(knight_pipe LINK_PUBLIC libcserialport)
+target_include_directories(knight_pipe PUBLIC ${CMAKE_SOURCE_DIR}/thirdparty/CSerialPort/include)
+
 
 function(INCLUDE_SUBMODULE MODULE_NAME)
     add_library(${MODULE_NAME} INTERFACE)
@@ -31,5 +37,4 @@ function(INCLUDE_SUBMODULE MODULE_NAME)
     target_link_libraries(knight_pipe PRIVATE ${MODULE_NAME})
 endfunction()
 
-include_submodule(serial)
 include_submodule(argparse)
