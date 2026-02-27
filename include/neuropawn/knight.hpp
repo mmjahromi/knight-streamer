@@ -26,13 +26,23 @@ struct KnightIMUSample : KnightSample
 };
 
 
+class IKnightSampleListener
+{
+    public:
+    virtual void onSampleReceived(KnightSample sample);
+};
+
+
 class KnightProtocolParser : public serial::IProtocolParser
 {
     protected:
     int mGain = 12;
+    IKnightSampleListener* mListener;
 
     virtual const unsigned char messageLength()
     { return MESSAGE_LENGTH; }
+
+    virtual KnightSample parseSample(serial::IProtocolResult result); 
 
     public:
     KnightProtocolParser(int gain = 12): mGain(gain) {}
@@ -40,7 +50,8 @@ class KnightProtocolParser : public serial::IProtocolParser
     unsigned int parse(const void *buffer, unsigned int size,ResultVector &results);
     void onProtocolEvent(ResultVector &results);
 
-    virtual KnightSample parseSample(serial::IProtocolResult result); 
+    void setListener(IKnightSampleListener* listener);
+    void removeListener();
 };
 
 class KnightIMUProtocolParser : public KnightProtocolParser

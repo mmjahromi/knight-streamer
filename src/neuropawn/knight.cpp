@@ -50,7 +50,7 @@ void KnightProtocolParser::onProtocolEvent(ResultVector &results)
     for (const serial::IProtocolResult& result : results)
     {
         KnightSample sample = parseSample(result);
-        PRINTF("Sample {} received, channel 1 value : {}", sample.counter, sample[0]);
+        if (mListener) mListener->onSampleReceived(sample);
     }
 }
 
@@ -72,4 +72,14 @@ KnightSample KnightProtocolParser::parseSample(serial::IProtocolResult result)
     sample.lOffStatP = result.data[LOffStatP_DATA_OFFSET];
     sample.lOffStatN = result.data[LOffStatN_DATA_OFFSET];
     return sample;
+}
+
+
+void KnightProtocolParser::setListener(IKnightSampleListener* listener)
+{
+    mListener = listener;
+}
+void KnightProtocolParser::removeListener()
+{
+    mListener = nullptr;
 }
