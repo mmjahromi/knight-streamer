@@ -15,7 +15,7 @@ inline float castFourByteFloat (const unsigned char* bytes)
         | bytes[2] << 16 | bytes[3] << 24;
     float result;
     static_assert (sizeof (float) == 4, "float must be 4 bytes");
-    return std::memcpy(&result, &littleEndianInt, 4);
+    return *(float*)std::memcpy(&result, &littleEndianInt, 4);
 }
 
 inline Vector3 castVector3 (const unsigned char* bytes)
