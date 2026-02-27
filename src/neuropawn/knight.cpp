@@ -41,6 +41,8 @@ unsigned int KnightProtocolParser::parse
             startByteFound = false;
         }
     }
+
+    return processedSize;
 }
 
 void KnightProtocolParser::onProtocolEvent(ResultVector &results)
