@@ -1,6 +1,7 @@
 # include "interaction/arguments.hpp"
 # include "interaction/port_selection.hpp"
 # include "neuropawn/knight.hpp"
+# include "transmission/eeg_messenger.hpp"
 # include "utils/print_helpers.hpp"
 
 
@@ -18,20 +19,27 @@ int main(int argc, char* argv[])
     KnightProtocolParser parser = arguments.useIMUProtocol
         ? KnightIMUProtocolParser(arguments.gain)
         : KnightProtocolParser(arguments.gain);
-    port.setProtocolParser(&parser);
+    EEGMessenger messenger {arguments.streamName};
 
+    parser.setListener(&messenger);
+    port.setProtocolParser(&parser);
     port.init(
         port_name, 115200,
         serial::ParityNone,
         serial::DataBits8,
         serial::StopTwo
     );
-    if (port.open()) PRINTF("Opened serial port {}.", port_name)
+    
+    bool portOpened = port.open();
+
+    if (portOpened)
+    {
+        PRINTF("Opened serial port {}.", port_name)
+        for (;;) { sleep(100); }
+    }
     else
     {
         PRINTERR("Failed to open serial port.")
         exit(1);
     }
-
-    for (;;) { sleep(100); }
 }

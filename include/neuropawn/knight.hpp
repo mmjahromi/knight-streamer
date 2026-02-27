@@ -29,7 +29,7 @@ struct KnightIMUSample : KnightSample
 class IKnightSampleListener
 {
     public:
-    virtual void onSampleReceived(KnightSample sample);
+    virtual void onSampleReceived(KnightSample) {}
 };
 
 
