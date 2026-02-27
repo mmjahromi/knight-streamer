@@ -2,9 +2,9 @@
 
 
 struct CommandLineArguments {
-    std::string serial_port = "";
+    std::string serialPort = "";
     std::string montage = "";
-    std::string stream_name = "";
+    std::string streamName = "";
 };
 
 CommandLineArguments ParseCommandLineArguments(int argc, char* argv[]);

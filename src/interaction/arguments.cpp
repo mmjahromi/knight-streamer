@@ -15,7 +15,7 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
 
     parser.add_argument("-p", "--port", "--port-name", "--serial-port")
         .help("Serial port address of the target device")
-        .store_into(arguments.serial_port);
+        .store_into(arguments.serialPort);
 
     parser.add_argument("-m", "--montage")
         .help("Channel labels in a comma-delimited list")
@@ -24,7 +24,7 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
     parser.add_argument("-n", "--stream-name")
         .help("Name of the lsl stream through which to stream")
         .default_value("Knight_EEG")
-        .store_into(arguments.stream_name);
+        .store_into(arguments.streamName);
 
     try
     {

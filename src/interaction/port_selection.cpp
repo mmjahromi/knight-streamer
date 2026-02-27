@@ -2,26 +2,26 @@
 # include "utils/print_helpers.hpp"
 
 
-const char* select_port(std::string port_name)
+const char* selectPort(std::string portName)
 {
-    while (port_name.empty())
+    while (portName.empty())
     {
         PRINT("Serial Port not specified.");
         PRINT("\t0) rescan");
 
-        auto devices_found = serial::CSerialPortInfo::availablePortInfos();
-        int device_count = (int)devices_found.size();
+        auto availableDevices = serial::CSerialPortInfo::availablePortInfos();
+        int deviceCount = (int)availableDevices.size();
 
-        int device_index = 1;
-        for (const serial::SerialPortInfo& device : devices_found)
+        int deviceIndex = 1;
+        for (const serial::SerialPortInfo& device : availableDevices)
         {
             PRINTF(
-                "\t {}) {} : {}", device_index++,
+                "\t {}) {} : {}", deviceIndex++,
                 device.portName, device.description
             );
         }
-        PRINTF("\t{}+) exit", device_index);
-        OUTF("Which do you want to use? [0-{}]\t", device_index);
+        PRINTF("\t{}+) exit", deviceIndex);
+        OUTF("Which do you want to use? [0-{}]\t", deviceIndex);
 
         try
         {
@@ -30,10 +30,10 @@ const char* select_port(std::string port_name)
             int selection = std::stoi(input);
 
             if (selection < 0) throw std::exception("invalid input");
-            if (selection > 0 && selection >= device_count) exit(0);
+            if (selection > 0 && selection >= deviceCount) exit(0);
             else if (selection > 1)
             {
-                port_name = devices_found[selection - 1].portName;
+                portName = availableDevices[selection - 1].portName;
             }
         }
         catch (const std::exception& err)
@@ -42,7 +42,7 @@ const char* select_port(std::string port_name)
             (void)err; exit(0);
         }
 
-        if (port_name.empty()) clear_lines(device_count + 5);
+        if (portName.empty()) clear_lines(deviceCount + 5);
     }
-    return port_name.c_str();
+    return portName.c_str();
 }

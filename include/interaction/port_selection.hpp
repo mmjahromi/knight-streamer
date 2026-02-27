@@ -1,4 +1,4 @@
 # pragma once
 
 
-const char* select_port(std::string port_name);
+const char* selectPort(std::string port_name);

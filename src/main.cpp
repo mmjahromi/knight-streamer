@@ -11,8 +11,9 @@ int main(int argc, char* argv[])
     {
         PRINT("Montage not specified, stream will be missing channel label metadata.");
     }
-    const char* port_name = select_port(arguments.serial_port);
+    const char* port_name = selectPort(arguments.serialPort);
 
-    serial::CSerialPort serial_connection(port_name);
-    serial_connection.init(port_name, 115200);
+    serial::CSerialPort port(port_name);
+    port.setBaudRate(115200);
+    port.setStopBits(serial::StopBits::StopTwo);
 }
