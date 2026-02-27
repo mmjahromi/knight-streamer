@@ -1,5 +1,5 @@
-# include "arguments.hpp"
 # include "version.h"
+# include "interaction/arguments.hpp"
 # include "utils/print_helpers.hpp"
 
 
@@ -13,7 +13,7 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
         "from the NeuroPawn Knight board through lsl."
     );
 
-    parser.add_argument("-p", "--port", "--serial-port")
+    parser.add_argument("-p", "--port", "--port-name", "--serial-port")
         .help("Serial port address of the target device")
         .store_into(arguments.serial_port);
 

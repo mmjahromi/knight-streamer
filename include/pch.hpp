@@ -8,6 +8,7 @@
 
 # include "lsl_cpp.h"
 # include "argparse/argparse.hpp"
+# include "CSerialPort/SerialPort.h"
 # include "CSerialPort/SerialPortInfo.h"
 
 namespace serial = itas109;
