@@ -30,13 +30,22 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    PRINT("---");
     PRINTF("Opened serial port {}.", portName)
 
-    port.setOperateMode(serial::SynchronousOperate);
+    bool configResult = true;
     for (int i = 1; i < CHANNEL_COUNT + 1; i++)
     {
-        port.writeData(std::format("chon_{}_12", i).c_str(), 9);
-        port.writeData(std::format("rldadd_{}", i).c_str(), 8);
+        configResult &= port.writeData(std::format("chon_{}_12", i).c_str(), 10) == 10;
+        sleep(1);
+        configResult &= port.writeData(std::format("rldadd_{}", i).c_str(), 9) == 9;
+        sleep(1);
+        if (!configResult)
+        {
+            PRINTERR("Failed to configure board.");
+            port.close();
+            exit(1);
+        }
     }
 
     PRINT("Activated channels")
@@ -46,7 +55,6 @@ int main(int argc, char* argv[])
         : KnightProtocolParser(arguments.gain);
     EEGMessenger messenger {arguments.streamName};
 
-    port.setOperateMode(serial::AsynchronousOperate);
     parser.setListener(&messenger);
     port.setProtocolParser(&parser);
 
