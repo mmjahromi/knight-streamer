@@ -17,11 +17,11 @@ const std::string selectPort(std::string argumentValue)
         for (const serial::SerialPortInfo& device : availableDevices)
         {
             PRINTF(
-                "\t {}) {} : {}", deviceIndex++,
+                "\t{}) {} : {}", deviceIndex++,
                 device.portName, device.description
             );
         }
-        PRINTF("\t{}+) exit", deviceIndex);
+        PRINTF("\t{}) exit", deviceIndex);
         OUTF("Which do you want to use? [0-{}]\t", deviceIndex);
 
         try
@@ -30,8 +30,11 @@ const std::string selectPort(std::string argumentValue)
             std::cin >> input;
             int selection = std::stoi(input);
 
-            if (selection < 0) throw std::exception("invalid input");
-            if (selection > 0 && selection > deviceCount) exit(0);
+            if (selection == deviceCount + 1) exit(0);
+            if (selection < 0 || selection > deviceCount + 1)
+            {
+                throw std::exception("invalid input");
+            }
             else if (selection > 0)
             {
                 portName = availableDevices[selection - 1].portName;
