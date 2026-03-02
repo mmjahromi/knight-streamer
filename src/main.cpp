@@ -47,7 +47,8 @@ int main(int argc, char* argv[])
     parser.setListener(&messenger);
     port.setProtocolParser(&parser);
 
-    messenger.awaitSample();
+    sleep(500);
+    messenger.awaitSample(0, true);
     clear_line();
     PRINTF("Opened serial port {}.", portName);
 
@@ -55,7 +56,7 @@ int main(int argc, char* argv[])
     {
         OUTF("Activating Channel {}...", i);
         enableKnightBoardEEGChannel(port, i);
-        messenger.awaitSample();
+        messenger.awaitSample(i - 1);
         clear_line();
     }
     PRINT("Streaming Data.");

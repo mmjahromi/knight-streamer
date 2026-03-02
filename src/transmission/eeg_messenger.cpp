@@ -38,13 +38,14 @@ EEGMessenger::~EEGMessenger()
 
 void EEGMessenger::onSampleReceived(KnightSample sample)
 {
-    mSampleReceived = true;
+    mLastSampleReceived = sample;
     mOutlet->push_sample(sample.eegChannels);
 }
 
-void EEGMessenger::awaitSample(int minimumWaitTime)
+void EEGMessenger::awaitSample(int channelIndex, bool allowZeroValue)
 {
-    sleep(minimumWaitTime);
-    mSampleReceived = false;
-    while (!mSampleReceived);
+    uint8_t lastCounterValue = mLastSampleReceived.counter;
+    while (mLastSampleReceived.counter == lastCounterValue);
+    if (allowZeroValue) return;
+    while (mLastSampleReceived.eegChannels[channelIndex] == 0);
 }
