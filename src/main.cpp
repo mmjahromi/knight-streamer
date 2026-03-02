@@ -7,7 +7,8 @@
 
 
 void HandleInterrupt(int);
-static volatile bool interrupted = false;
+serial::CSerialPort *portHandle;
+static bool interrupted = false;
 
 
 int main(int argc, char* argv[])
@@ -33,6 +34,7 @@ int main(int argc, char* argv[])
         exit(1);
     }
     
+    portHandle = &port;
     signal(SIGINT, HandleInterrupt);
     signal(SIGTERM, HandleInterrupt);
 
@@ -58,10 +60,7 @@ int main(int argc, char* argv[])
     }
     PRINT("Streaming Data.");
 
-    while (!interrupted) { sleep(100); }
-
-    PRINT("Closing port...")
-    port.close();
+    while (true) { sleep(100); }
 }
 
 
@@ -70,7 +69,10 @@ void HandleInterrupt(int s)
     if (!interrupted)
     {
         interrupted = true;
-        PRINT("---");
+        PRINT("-!-");
+        PRINT("Closing port...")
+        portHandle->close();
+        exit(0);
     }
     signal(s, HandleInterrupt);
 }
