@@ -4,7 +4,7 @@
 EEGMessenger::EEGMessenger
 (
     std::string streamName, 
-    std::string montageString,
+    std::vector<std::string> channelLabels,
     std::string sourceId
 )
 {
@@ -16,15 +16,20 @@ EEGMessenger::EEGMessenger
     lsl::xml_element description = info.desc();
     description.append_child_value("manufacturer", "NeuroPawn");
 
-    std::vector<std::string> channelLabels = splitString(montageString);
-
+    bool channelsLabelled = !channelLabels.empty();
     lsl::xml_element channels = description.append_child("channels");
     for (int i = 0; i < CHANNEL_COUNT; i++)
     {
+        if (channelsLabelled && channelLabels[i].empty()) continue;
+
         lsl::xml_element ch = channels.append_child("channel");
-        ch.append_child_value("label", channelLabels[i]);
         ch.append_child_value("unit", "microvolts");
         ch.append_child_value("type", "EEG");
+
+        if (channelsLabelled)
+        {
+            ch.append_child_value("label", channelLabels[i]);
+        }
     }
 
     mOutlet = new lsl::stream_outlet(info);

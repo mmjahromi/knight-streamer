@@ -15,11 +15,24 @@ void clear_lines(int line_count)
 
 std::vector<std::string> splitString(std::string& input, char delimiter)
 {
-    std::istringstream stream(input);
-    std::vector<std::string> parts;
-    std::string token;
-    while (std::getline(stream, token, delimiter)) {
-        parts.push_back(token);
+    std::vector<std::string> tokens;
+    int tokenStart = 0;
+
+    for (int i = 0; i <= input.size(); i++)
+    {
+        if (input[i] == delimiter || input[i] == '\0')
+        {
+            tokens.emplace_back(input.substr(tokenStart, i - tokenStart));
+            tokenStart = i + 1;
+        }
     }
-    return parts;
+    return tokens;
+}
+
+void removeCharacterInstances(std::string& input, char target)
+{
+    input.erase(
+        std::remove(input.begin(), input.end(), target),
+        input.end()
+    );
 }

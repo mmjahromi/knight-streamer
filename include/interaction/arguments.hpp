@@ -3,13 +3,15 @@
 
 struct CommandLineArguments {
     std::string serialPort = "";
-    int gain = 12;
     bool useIMUProtocol = false;
 
+    static const std::set<int> validGainValues;
+    int gain = 12;
+
     std::string streamName = "";
-    std::string montageString = "";
+    std::vector<std::string> channelLabels;
 };
 
-const std::set<int> validGainValues = {1, 2, 3, 4, 6, 8, 12};
-
 CommandLineArguments ParseCommandLineArguments(int argc, char* argv[]);
+void ValidateCommandLineArguments(CommandLineArguments arguments);
+std::vector<std::string> ParseChannelLabels(std::string montageString);

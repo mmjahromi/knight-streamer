@@ -14,11 +14,6 @@ static bool interrupted = false;
 int main(int argc, char* argv[])
 {
     CommandLineArguments arguments = ParseCommandLineArguments(argc, argv);
-
-    if (arguments.montageString.empty())
-    {
-        PRINT("Montage not specified, stream will be missing channel label metadata.");
-    }
     std::string portName = selectPort(arguments.serialPort);
 
     PRINT("---");
@@ -42,7 +37,7 @@ int main(int argc, char* argv[])
     KnightProtocolParser parser = arguments.useIMUProtocol
         ? KnightIMUProtocolParser(arguments.gain)
         : KnightProtocolParser(arguments.gain);
-    EEGMessenger messenger {arguments.streamName, arguments.montageString};
+    EEGMessenger messenger {arguments.streamName, arguments.channelLabels};
 
     parser.setListener(&messenger);
     port.setProtocolParser(&parser);
@@ -52,16 +47,21 @@ int main(int argc, char* argv[])
     clear_line();
     PRINTF("Opened serial port {}.", portName);
 
-    for (int i = 1; i < CHANNEL_COUNT + 1; i++)
+    for (int i = 0; i < CHANNEL_COUNT; i++)
     {
-        OUTF("Activating Channel {}...", i);
+        if (
+            !arguments.channelLabels.empty() &&
+            arguments.channelLabels[i].empty()
+        ) continue;
+
+        OUTF("Activating Channel {}...", i + 1);
         enableKnightBoardEEGChannel(port, i);
-        messenger.awaitSample(i - 1);
+        messenger.awaitSample(i);
         clear_line();
 
-        OUTF("Adding channel {} to Right Leg Drive...", i);
+        OUTF("Adding channel {} to Right Leg Drive...", i + 1);
         addKnightBoardChannelToRightLegDrive(port, i);
-        messenger.awaitSample(i - 1);
+        messenger.awaitSample(i);
         clear_line();
     }
     PRINT("Streaming Data.");

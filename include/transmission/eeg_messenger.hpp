@@ -11,7 +11,7 @@ class EEGMessenger : public IKnightSampleListener
     ~EEGMessenger();
     EEGMessenger(
         std::string streamName,
-        std::string montageString,
+        std::vector<std::string> channelLabels,
         std::string sourceId = "Knight_Streamer"
     );
     

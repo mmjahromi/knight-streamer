@@ -1,11 +1,17 @@
 # include "version.h"
 # include "interaction/arguments.hpp"
+# include "neuropawn/knight_protocol_constants.h"
 # include "utils/print_helpers.hpp"
+
+using namespace KnightProtocolConstants;
 
 
 CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
 {
     CommandLineArguments arguments;
+    std::string montageString;
+    std::vector<std::string> channelLabels;
+
     argparse::ArgumentParser parser("NeuroPawn Knight Pipe", VERSION);
 
     parser.add_description(
@@ -35,17 +41,19 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
         .store_into(arguments.streamName);
 
     parser.add_argument("-m", "--montage")
-        .help("Channel labels in a comma-delimited list")
-        .store_into(arguments.montageString);
+        .help(
+            "Channel labels in a comma-delimited list.\n"
+            "Example: \"PO8,PO4, ,POZ,OZ,PO7, ,P03\"\n"
+            "Empty labels will disable the channel.\n" +
+            std::format("All {} channels must be specified.\n", CHANNEL_COUNT)
+        ).store_into(montageString);
 
     try
     {
         parser.parse_args(argc, argv);
 
-        if (!validGainValues.count(arguments.gain))
-        {
-            throw std::exception("Invalid gain value - allowed options: {1, 2, 3, 4, 6, 8, 12}");
-        }
+        ValidateCommandLineArguments(arguments);
+        arguments.channelLabels = ParseChannelLabels(montageString);
     }
     catch (const std::exception& err)
     {
@@ -53,4 +61,47 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
         std::exit(1);
     }
     return arguments;
+}
+
+
+const std::set<int> CommandLineArguments::validGainValues = {1, 2, 3, 4, 6, 8, 12};
+
+void ValidateCommandLineArguments(CommandLineArguments arguments)
+{
+    if (!CommandLineArguments::validGainValues.count(arguments.gain))
+    {
+        throw std::exception(
+            "Invalid gain value - allowed options: {1, 2, 3, 4, 6, 8, 12}"
+        );
+    }
+}
+
+
+std::vector<std::string> ParseChannelLabels(std::string montageString)
+{
+    removeCharacterInstances(montageString, ' ');
+
+    if (montageString.empty())
+    {
+        PRINTF("Montage not specified, will assume {} active channels.", CHANNEL_COUNT);
+        PRINT("Stream will be missing channel label metadata.");
+        return {};
+    }
+
+    std::vector<std::string> channelLabels = splitString(montageString);
+    if (channelLabels.size() != CHANNEL_COUNT)
+    {
+        throw std::exception(
+            std::format(
+                "Invalid montage - all {} channels must be labelled or disabled.",
+                CHANNEL_COUNT
+            ).c_str()
+        );
+    }
+
+    for (int i = 0; i < KnightProtocolConstants::CHANNEL_COUNT; i++)
+    {
+        if (!channelLabels[i].empty()) return channelLabels;
+    }
+    throw std::exception("All channels disabled, nothing to stream.");
 }

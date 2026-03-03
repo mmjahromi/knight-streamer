@@ -4,12 +4,12 @@
 
 bool enableKnightBoardEEGChannel(serial::CSerialPort &port, int channelIndex)
 {
-    return writeSerialCommand(port, std::format("chon_{}_12", channelIndex));
+    return writeSerialCommand(port, std::format("chon_{}_12", channelIndex + 1));
 }
 
 bool addKnightBoardChannelToRightLegDrive(serial::CSerialPort &port, int channelIndex)
 {
-    return writeSerialCommand(port, std::format("rldadd_{}", channelIndex));
+    return writeSerialCommand(port, std::format("rldadd_{}", channelIndex + 1));
 }
 
 bool writeSerialCommand(serial::CSerialPort &port, std::string command)
