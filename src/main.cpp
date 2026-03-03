@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     parser.setListener(&messenger);
     port.setProtocolParser(&parser);
 
-    sleep(500);
+    port.flushReadBuffers();
     messenger.awaitSample(0, true);
     ellipsisDisplay.pause();
 
@@ -63,12 +63,14 @@ int main(int argc, char* argv[])
         OUTF("Activating Channel {}", i + 1);
         ellipsisDisplay.start();
         enableKnightBoardEEGChannel(port, i);
+        port.flushReadBuffers();
         messenger.awaitSample(i);
         ellipsisDisplay.pause();
 
         OUTF("Adding channel {} to Right Leg Drive", i + 1);
         ellipsisDisplay.start();
         addKnightBoardChannelToRightLegDrive(port, i);
+        port.flushReadBuffers();
         messenger.awaitSample(i);
         ellipsisDisplay.pause();
     }
