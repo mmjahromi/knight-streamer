@@ -8,27 +8,35 @@ EEGMessenger::EEGMessenger
     std::string sourceId
 )
 {
+    bool channelsLabelled = !channelLabels.empty();
+    int enabledChannelCount = 0;
+    enabledChannels = {};
+
+    for (int i = 0; i < CHANNEL_COUNT; i++)
+    {
+        if (channelsLabelled && channelLabels[i].empty()) continue;
+        enabledChannels.emplace_back(i);
+        enabledChannelCount++;
+    }
+
     lsl::stream_info info (
-        streamName, "EEG", CHANNEL_COUNT,
+        streamName, "EEG", enabledChannelCount,
         SAMPLE_RATE, lsl::cf_float32, sourceId
     );
 
     lsl::xml_element description = info.desc();
     description.append_child_value("manufacturer", "NeuroPawn");
 
-    bool channelsLabelled = !channelLabels.empty();
     lsl::xml_element channels = description.append_child("channels");
-    for (int i = 0; i < CHANNEL_COUNT; i++)
+    for (int channelIndex : enabledChannels)
     {
-        if (channelsLabelled && channelLabels[i].empty()) continue;
-
         lsl::xml_element ch = channels.append_child("channel");
         ch.append_child_value("unit", "microvolts");
         ch.append_child_value("type", "EEG");
 
         if (channelsLabelled)
         {
-            ch.append_child_value("label", channelLabels[i]);
+            ch.append_child_value("label", channelLabels[channelIndex]);
         }
     }
 
@@ -44,7 +52,13 @@ EEGMessenger::~EEGMessenger()
 void EEGMessenger::onSampleReceived(KnightSample sample)
 {
     mLastSampleReceived = sample;
-    mOutlet->push_sample(sample.eegChannels);
+
+    std::vector<double> activeChannelValues {};
+    for (int channelIndex : enabledChannels)
+    {
+        activeChannelValues.emplace_back(sample[channelIndex]);
+    }
+    mOutlet->push_sample(activeChannelValues);
 }
 
 void EEGMessenger::awaitSample(int channelIndex, bool allowZeroValue)

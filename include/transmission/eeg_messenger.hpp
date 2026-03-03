@@ -6,6 +6,7 @@ class EEGMessenger : public IKnightSampleListener
 {
     lsl::stream_outlet* mOutlet;
     KnightSample mLastSampleReceived;
+    std::vector<int> enabledChannels;
 
     public:
     ~EEGMessenger();
