@@ -1,5 +1,5 @@
 # include "neuropawn/knight_serial_commands.hpp"
-# include "utils/print_helpers.hpp"
+# include "utils/io_helpers.hpp"
 
 
 bool enableKnightBoardEEGChannel(serial::CSerialPort &port, int channelIndex)
