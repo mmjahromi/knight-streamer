@@ -12,7 +12,7 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
     std::string montageString;
     std::vector<std::string> channelLabels;
 
-    argparse::ArgumentParser parser("NeuroPawn Knight Pipe", VERSION);
+    argparse::ArgumentParser parser("NeuroPawn Knight Streamer", VERSION);
 
     parser.add_description(
         "A simple command line interface to direct data "
@@ -40,7 +40,7 @@ CommandLineArguments ParseCommandLineArguments(int argc, char* argv[])
         .default_value("Knight_EEG")
         .store_into(arguments.streamName);
 
-    parser.add_argument("-m", "--montage")
+    parser.add_argument("-m", "--montage", "--montage-string")
         .help(
             "Channel labels in a comma-delimited list.\n"
             "Example: \"PO8,PO4, ,POZ,OZ,PO7, ,P03\"\n"
