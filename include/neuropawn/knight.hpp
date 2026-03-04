@@ -1,9 +1,9 @@
 # pragma once
 # include "knight_protocol_constants.h"
+# include "utils/serial_helpers.hpp"
 # include "utils/vector3.hpp"
 
 using namespace KnightProtocolConstants;
-using ResultVector = std::vector<serial::IProtocolResult>;
 
 
 struct KnightSample
@@ -13,6 +13,9 @@ struct KnightSample
     double lOffStatP;
     double lOffStatN;
 
+    KnightSample() {}
+    KnightSample(const unsigned char* data, int gain);
+    static KnightSample parse(const unsigned char* data, int gain);
     double& operator[](int i) { return eegChannels[i]; }
 };
 
@@ -22,7 +25,8 @@ struct KnightIMUSample : KnightSample
     Vector3 mag;
     Vector3 gyro;
 
-    KnightIMUSample(KnightSample sample);
+    KnightIMUSample(const unsigned char* data, int gain);
+    static KnightSample parse(const unsigned char* data, int gain);
 };
 
 
@@ -36,32 +40,24 @@ class IKnightSampleListener
 class KnightProtocolParser : public serial::IProtocolParser
 {
     protected:
-    int mGain = 12;
+    int mMessageLength;
+    int mGain;
+    KnightSample (*mSampleConstructor)(const unsigned char* data, int gain);
     IKnightSampleListener* mListener;
 
-    virtual const unsigned char messageLength()
-    { return MESSAGE_LENGTH; }
-
-    virtual KnightSample parseSample(serial::IProtocolResult result); 
-
     public:
-    KnightProtocolParser(int gain = 12): mGain(gain) {}
+    KnightProtocolParser() {}
+    KnightProtocolParser(
+        KnightSample (*sampleConstructor)(const unsigned char*, int),
+        int messageLength = MESSAGE_LENGTH, int gain = 12
+    ):
+        mMessageLength(messageLength), mGain(gain),
+        mSampleConstructor(sampleConstructor)
+    {}
 
-    unsigned int parse(const void *buffer, unsigned int size,ResultVector &results);
+    unsigned int parse(const void *buffer, unsigned int size, ResultVector &results);
     void onProtocolEvent(ResultVector &results);
 
     void setListener(IKnightSampleListener* listener);
     void removeListener();
-};
-
-class KnightIMUProtocolParser : public KnightProtocolParser
-{
-    protected:
-    const unsigned char messageLength()
-    { return IMU_MESSAGE_LENGTH; }
-
-    KnightSample parseSample(serial::IProtocolResult result) override;
-
-    public:
-    KnightIMUProtocolParser(int gain = 12): KnightProtocolParser(gain) {}
 };

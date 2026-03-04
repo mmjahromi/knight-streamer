@@ -1,5 +1,6 @@
 # include "neuropawn/knight_serial_interface.hpp"
 # include "utils/io_helpers.hpp"
+# include "utils/serial_helpers.hpp"
 
 
 bool KnightBoardSerialInterface::openPort(std::string portName)
@@ -23,8 +24,8 @@ void KnightBoardSerialInterface::initialize
     mGain = gain;
     mMessenger = messenger;
     mParser = useIMUProtocol
-        ? KnightIMUProtocolParser(gain)
-        : KnightProtocolParser(gain);
+        ? KnightProtocolParser(KnightSample::parse, IMU_MESSAGE_LENGTH, gain)
+        : KnightProtocolParser(KnightIMUSample::parse, MESSAGE_LENGTH, gain);
 
     mParser.setListener(mMessenger);
     mPort.setProtocolParser(&mParser);
@@ -64,18 +65,4 @@ void KnightBoardSerialInterface::awaitAnySample()
     if (mOnWaitStarted) mOnWaitStarted();
     while (mMessenger->getLatestCounter() != 0);
     if (mOnWaitCompleted) mOnWaitCompleted();
-}
-
-
-void writeSerialCommand(serial::CSerialPort &port, std::string command)
-{
-    int commandLength = (int)command.length();
-    int writtenBytes = port.writeData(command.c_str(), commandLength);
-
-    if (writtenBytes != commandLength)
-    {
-        PRINTERR("Failed to configure board.");
-        port.close();
-        exit(1);
-    }
 }

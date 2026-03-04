@@ -12,12 +12,13 @@ set(SUBMODULE_PATH ${CMAKE_SOURCE_DIR}/thirdparty)
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/utils/io_helpers.cpp
+    src/utils/serial_helpers.cpp
     src/interaction/arguments.cpp
     src/interaction/port_selection.cpp
     src/interaction/ellipsis_display.cpp
-    src/neuropawn/knight.cpp
-    src/neuropawn/knight_imu.cpp
     src/neuropawn/knight_serial_interface.cpp
+    src/neuropawn/knight_protocol_parser.cpp
+    src/neuropawn/knight_samples.cpp
     src/transmission/eeg_messenger.cpp
 )
 target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)

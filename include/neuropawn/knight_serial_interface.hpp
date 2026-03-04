@@ -3,8 +3,6 @@
 # include "transmission/eeg_messenger.hpp"
 
 
-void writeSerialCommand(serial::CSerialPort &port, std::string command);
-
 class KnightBoardSerialInterface
 {
     private:
