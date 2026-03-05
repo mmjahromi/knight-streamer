@@ -12,3 +12,5 @@ unsigned int splitBufferIntoMessages(
     const unsigned char EndByte,
     ResultVector &results
 );
+
+long long getCurrentTimestamp();

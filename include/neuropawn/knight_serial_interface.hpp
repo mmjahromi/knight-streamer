@@ -14,8 +14,11 @@ class KnightBoardSerialInterface
     void (*mOnWaitStarted)();
     void (*mOnWaitCompleted)();
 
-    void awaitSample(int channelIndex);
-    void awaitAnySample();
+    bool awaitChannelValue(int channelIndex, int timeout = 1000);
+    bool awaitPortCondition(std::function<bool()> predicate, int timeout);
+    std::function<bool()> buildNewSamplePredicate();
+
+    void ensureChannelConfiguration(int channelIndex, std::string command);
 
     public:
     KnightBoardSerialInterface(
@@ -25,11 +28,14 @@ class KnightBoardSerialInterface
         mOnWaitCompleted(onWaitCompleted)
     {}
 
-    bool openPort(std::string portName);
-    void closePort();
+    inline bool openPort() { return mPort.open(); }
+    inline void closePort() { mPort.close(); }
+
     void initialize(
+        std::string portName,
         int gain, bool useIMUProtocol,
         EEGMessenger *messenger
     );
+    bool awaitBoardResponse(int timeout = 8000);
     void activateChannels(std::vector<int> channelIndices);
 };

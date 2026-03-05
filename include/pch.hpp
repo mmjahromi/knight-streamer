@@ -4,6 +4,8 @@
 
 # include <iostream>
 # include <thread>
+# include <functional>
+# include <chrono>
 # include <string>
 # include <cstdio>
 # include <cstring>

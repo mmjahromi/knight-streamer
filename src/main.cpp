@@ -22,13 +22,30 @@ int main(int argc, char* argv[])
     std::string portName = selectPort(arguments.serialPort);
 
     PRINT("---");
-    OUTF("Opening serial port {}", portName);
+    OUTF("Initializing Board Interface");
     startWaitDisplay();
 
     KnightBoardSerialInterface boardInterface(
         startWaitDisplay, pauseWaitDisplay
     );
-    if (!boardInterface.openPort(portName))
+
+    EEGMessenger messenger {
+        arguments.streamName,
+        arguments.channelLabels
+    };
+
+    boardInterface.initialize(
+        portName,
+        arguments.gain,
+        arguments.useIMUProtocol,
+        &messenger
+    );
+
+    pauseWaitDisplay();
+    OUTF("Opening serial port {}", portName);
+    startWaitDisplay();
+
+    if (!boardInterface.openPort())
     {
         ellipsisDisplay.stop();
         clear_line();
@@ -41,18 +58,14 @@ int main(int argc, char* argv[])
     boardInterfaceHandle = &boardInterface;
     signal(SIGINT, HandleInterrupt);
     signal(SIGTERM, HandleInterrupt);
+    
+    OUTF("Waiting for board response")
+    if (!boardInterface.awaitBoardResponse())
+    {
+        PRINTERR("Board is not responding.");
+        exit(1);
+    }
 
-    EEGMessenger messenger {
-        arguments.streamName,
-        arguments.channelLabels
-    };
-
-    OUTF("Initializing Board");
-    boardInterface.initialize(
-        arguments.gain,
-        arguments.useIMUProtocol,
-        &messenger
-    );
     boardInterface.activateChannels(messenger.getEnabledChannels());
 
     COUT("Streaming Data");

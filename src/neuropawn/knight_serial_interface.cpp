@@ -3,24 +3,14 @@
 # include "utils/serial_helpers.hpp"
 
 
-bool KnightBoardSerialInterface::openPort(std::string portName)
-{
-    mPort.init(portName.c_str(), BAUD_RATE);
-    return mPort.open();
-}
-
-void KnightBoardSerialInterface::closePort()
-{
-    mPort.close();
-}
-
-
 void KnightBoardSerialInterface::initialize
 (
+    std::string portName,
     int gain, bool useIMUProtocol,
     EEGMessenger *messenger
 )
 {
+    mPort.init(portName.c_str(), BAUD_RATE);
     mGain = gain;
     mMessenger = messenger;
     mParser = useIMUProtocol
@@ -29,40 +19,85 @@ void KnightBoardSerialInterface::initialize
 
     mParser.setListener(mMessenger);
     mPort.setProtocolParser(&mParser);
-    awaitAnySample();
 }
 
-void KnightBoardSerialInterface::activateChannels(std::vector<int> channelIndices)
+
+bool KnightBoardSerialInterface::awaitBoardResponse(int timeout)
 {
+    return awaitPortCondition(buildNewSamplePredicate(), timeout);
+}
+
+
+void KnightBoardSerialInterface::activateChannels(std::vector<int> channelIndices)
+{    
     for (int channelIndex : channelIndices)
     {
         int pinIndex = channelIndex + 1;
 
         OUTF("Activating Channel {}", pinIndex);
-        writeSerialCommand(mPort, std::format("chon_{}_{}", pinIndex, mGain));
-        awaitSample(channelIndex);
+        ensureChannelConfiguration(
+            channelIndex, std::format("chon_{}_{}", pinIndex, mGain)
+        );
 
         OUTF("Adding channel {} to Right Leg Drive", pinIndex);
-        writeSerialCommand(mPort, std::format("rldadd_{}", pinIndex));
-        awaitSample(channelIndex);
+        ensureChannelConfiguration(
+            channelIndex, std::format("rldadd_{}", pinIndex)
+        );
     }
 }
 
 
-void KnightBoardSerialInterface::awaitSample(int channelIndex)
+void KnightBoardSerialInterface::ensureChannelConfiguration(int channelIndex, std::string command)
 {
-    if (mOnWaitStarted) mOnWaitStarted();
-    mPort.flushReadBuffers();
-
-    unsigned char lastCounterValue = mMessenger->getLatestCounter();
-    while (mMessenger->getLatestCounter() == lastCounterValue);
-    while (mMessenger->getLatestChannelValue(channelIndex) == 0);
-    if (mOnWaitCompleted) mOnWaitCompleted();
+    bool channelValueReceived = false;
+    while (!channelValueReceived)
+    {
+        writeSerialCommand(mPort, command);
+        if (!awaitChannelValue(channelIndex))
+        {
+            PRINT("No response from board, trying again.");
+        }
+    }
 }
 
-void KnightBoardSerialInterface::awaitAnySample()
+
+bool KnightBoardSerialInterface::awaitChannelValue(int channelIndex, int timeout)
+{
+    auto newSamplePredicate = buildNewSamplePredicate();
+    return awaitPortCondition(
+        [newSamplePredicate, channelIndex, this]()
+        {
+            return newSamplePredicate() &&
+            mMessenger->getLatestChannelValue(channelIndex) != 0;
+        },
+        timeout
+    );
+}
+
+bool KnightBoardSerialInterface::awaitPortCondition(std::function<bool()> predicate, int timeout)
 {
     if (mOnWaitStarted) mOnWaitStarted();
-    while (mMessenger->getLatestCounter() != 0);
+    mPort.flushBuffers();
+
+    long long startTime = getCurrentTimestamp();
+    while (!predicate())
+    {
+        sleep(10);
+        long long currentTime = getCurrentTimestamp();
+        if (currentTime - startTime > timeout)
+        {
+            if (mOnWaitCompleted) mOnWaitCompleted();
+            return false;
+        }
+    }
+
     if (mOnWaitCompleted) mOnWaitCompleted();
+    return true;
+}
+
+std::function<bool()> KnightBoardSerialInterface::buildNewSamplePredicate()
+{
+    unsigned char lastCounterValue = mMessenger->getLatestCounter();
+    return [lastCounterValue, this]()
+    { return mMessenger->getLatestCounter() != lastCounterValue; };
 }
