@@ -43,8 +43,8 @@ class KnightProtocolParser : public serial::IProtocolParser
     KnightSample (*mSampleConstructor)(const unsigned char* data, int gain);
     IKnightSampleListener* mListener;
 
-    int mMessageLength;
     int mGain;
+    unsigned char mMessageLength;
     bool mHasReceivedData;
 
     public:

@@ -23,7 +23,7 @@ unsigned int KnightProtocolParser::parse
     ResultVector &results
 )
 {
-    mHasReceivedData = true;
+    mHasReceivedData |= size > mMessageLength;
     return splitBufferIntoMessages(
         buffer, size,
         mMessageLength,
