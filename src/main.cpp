@@ -57,13 +57,13 @@ int main(int argc, char* argv[])
     signal(SIGINT, HandleInterrupt);
     signal(SIGTERM, HandleInterrupt);
     
-    COUT("Waiting for device response");
+    COUT("Waiting for data");
     ensureSuccess(
-        boardInterface.awaitDeviceResponse(),
-        "Device is not responding."
+        boardInterface.awaitSerialData(),
+        "Device is not streaming data."
     );
 
-    COUT("Waiting for data stream");
+    COUT("Looking for formatted samples in the data stream");
     if (!boardInterface.awaitParsedData())
     {
         OUTF(

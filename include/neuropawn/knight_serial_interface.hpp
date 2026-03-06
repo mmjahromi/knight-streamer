@@ -42,7 +42,7 @@ class KnightBoardSerialInterface
     );
     void swapProtocolFormat(bool useIMUProtocol);
 
-    bool awaitDeviceResponse(int timeout = 8000);
+    bool awaitSerialData(int timeout = 8000);
     bool awaitParsedData(int timeout = 500);
 
     void activateChannels(std::vector<int> channelIndices);

@@ -33,7 +33,7 @@ void KnightBoardSerialInterface::swapProtocolFormat(bool useIMUProtocol)
 }
 
 
-bool KnightBoardSerialInterface::awaitDeviceResponse(int timeout)
+bool KnightBoardSerialInterface::awaitSerialData(int timeout)
 {
     mPort.flushBuffers();
     mParser.resetDataReceptionFlag();
