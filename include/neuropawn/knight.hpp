@@ -45,6 +45,7 @@ class KnightProtocolParser
 
     int mGain;
     unsigned char mMessageLength;
+    unsigned char mMaximumSingleMessageBufferSize;
     bool mHasReceivedData;
     bool mHasParsedMessage;
 

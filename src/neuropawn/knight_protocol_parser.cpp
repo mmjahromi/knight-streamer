@@ -15,6 +15,7 @@ void KnightProtocolParser::applyFormat(ProtocolFormat format)
             mSampleConstructor = KnightIMUSample::parse;
             break;
     }
+    mMaximumSingleMessageBufferSize = 2 * mMessageLength - 1;
 }
 
 unsigned int KnightProtocolParser::processBuffer
@@ -27,7 +28,7 @@ unsigned int KnightProtocolParser::processBuffer
         mMessageLength,
         START_BYTE, END_BYTE
     );
-    mHasReceivedData |= size > 0;
+    mHasReceivedData |= size >= mMaximumSingleMessageBufferSize;
     mHasParsedMessage |= !messages.empty();
 
     if (mListener) notifyListener(messages);
