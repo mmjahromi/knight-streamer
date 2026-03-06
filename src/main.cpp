@@ -90,6 +90,13 @@ int main(int argc, char* argv[])
 
     while (true) {
         sleep(100);
+        if (!boardInterface.isConnected())
+        {
+            ellipsisDisplay.stop();
+            PRINT(std::endl << "---")
+            PRINT("Device Disconnected.");
+            break;
+        }
     }
 }
 

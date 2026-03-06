@@ -33,6 +33,7 @@ class KnightBoardSerialInterface
 
     inline bool openPort() { return mPort.open(); }
     inline void closePort() { mPort.close(); }
+    inline bool isConnected() { return mPort.isOpen(); }
 
     void initialize(
         std::string portName,
