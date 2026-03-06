@@ -6,6 +6,9 @@
 class KnightBoardSerialInterface
 {
     private:
+    static const unsigned int BUFFER_LENGTH = 4096;
+    static const unsigned char MAXIMUM_MESSAGE_LENGTH = IMU_MESSAGE_LENGTH;
+
     serial::CSerialPort mPort;
     KnightProtocolParser mParser;
     EEGMessenger *mMessenger;
@@ -14,6 +17,7 @@ class KnightBoardSerialInterface
     std::function<void()> mOnWaitStarted;
     std::function<void()> mOnWaitCompleted;
 
+    bool alignData(int timeout = 100);
     void ensureChannelConfiguration(
         int channelIndex, std::string command,
         std::string commandDescription
@@ -21,7 +25,6 @@ class KnightBoardSerialInterface
     bool awaitChannelValue(int channelIndex, int timeout = 2000);
     bool awaitCondition(std::function<bool()> predicate, int timeout);
     unsigned int readAndParseUsedBuffer();
-    void discardReadBuffer();
 
     public:
     KnightBoardSerialInterface(
