@@ -159,8 +159,13 @@ unsigned int KnightBoardSerialInterface::readAndParseUsedBuffer()
 {
     char buffer[BUFFER_LENGTH];
     unsigned int usedBufferLength = mPort.getReadBufferUsedLen();
-    if (usedBufferLength < mParser.messageLength()) return 0;
+    unsigned int messageLength = mParser.messageLength();
 
-    mPort.readData(buffer, usedBufferLength);
-    return mParser.processBuffer(buffer, usedBufferLength);
+    unsigned int messageCount = usedBufferLength / messageLength;
+    if (messageCount == 0) return 0;
+
+    unsigned int useableBufferLength = messageCount * messageLength;
+
+    mPort.readData(buffer, useableBufferLength);
+    return mParser.processBuffer(buffer, useableBufferLength);
 }
