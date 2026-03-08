@@ -16,9 +16,9 @@ void clear_lines(int line_count)
 std::vector<std::string> splitString(std::string& input, char delimiter)
 {
     std::vector<std::string> tokens;
-    int tokenStart = 0;
+    size_t tokenStart = 0;
 
-    for (int i = 0; i <= input.size(); i++)
+    for (size_t i = 0; i <= input.size(); i++)
     {
         if (input[i] == delimiter || input[i] == '\0')
         {

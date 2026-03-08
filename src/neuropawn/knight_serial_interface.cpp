@@ -55,7 +55,7 @@ bool KnightBoardSerialInterface::awaitParsedData(int timeout)
 
 bool KnightBoardSerialInterface::alignData(int timeout)
 {
-    char readByte[1];
+    unsigned char readByte[1];
     unsigned char readCount = 0;
 
     while (readByte[0] != START_BYTE && readCount < MAXIMUM_MESSAGE_LENGTH)

@@ -26,7 +26,6 @@ std::vector<SerialMessage> splitBufferIntoMessages
 {
     std::vector<SerialMessage> messages;
     unsigned int offset = 0;
-    unsigned int processedSize = 0;
     const unsigned char *ptr = static_cast<const unsigned char*>(buffer);
 
     bool startByteFound = false;
@@ -49,7 +48,6 @@ std::vector<SerialMessage> splitBufferIntoMessages
             {
                 messages.emplace_back(messageStart, messageLength);
                 offset = startByteOffset + messageLength;
-                processedSize = offset;
                 startByteFound = false;
             }
             else offset = startByteOffset + 1;

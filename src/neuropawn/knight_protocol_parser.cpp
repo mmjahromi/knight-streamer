@@ -38,7 +38,7 @@ unsigned int KnightProtocolParser::processBuffer
 void KnightProtocolParser::notifyListener(std::vector<SerialMessage> messages)
 {
     if (!mListener) return;
-    for (const SerialMessage message : messages)
+    for (const SerialMessage& message : messages)
     {
         KnightSample sample = mSampleConstructor(message.data, mGain);
         if (mListener) mListener->onSampleReceived(sample);

@@ -21,7 +21,11 @@ add_executable(${PROJECT_NAME}
     src/neuropawn/knight_samples.cpp
     src/transmission/eeg_messenger.cpp
 )
-target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
+endif()
 target_precompile_headers(${PROJECT_NAME} PRIVATE include/pch.hpp)
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
